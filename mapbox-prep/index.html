@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset='utf-8' />
+    <title>Store Locator</title>
+    <meta name='robots' content='noindex, nofollow'>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700' rel='stylesheet'>
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.8.1/mapbox-gl.js'></script>
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v1.8.1/mapbox-gl.css' rel='stylesheet' />
+    <style>
+        body {
+            color: #404040;
+            font: 400 15px/22px 'Source Sans Pro', 'Helvetica Neue', Sans-serif;
+            margin: 0;
+            padding: 0;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        * {
+            -webkit-box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            box-sizing: border-box;
+        }
+
+        .sidebar {
+            position: absolute;
+            width: 33.3333%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            overflow: hidden;
+            border-right: 1px solid rgba(0, 0, 0, 0.25);
+        }
+
+        .pad2 {
+            padding: 20px;
+        }
+
+        .map {
+            position: absolute;
+            left: 33.3333%;
+            width: 66.6666%;
+            top: 0;
+            bottom: 0;
+        }
+
+        h1 {
+            font-size: 22px;
+            margin: 0;
+            font-weight: 400;
+            line-height: 20px;
+            padding: 20px 2px;
+        }
+
+        a {
+            color: #404040;
+            text-decoration: none;
+        }
+
+        a:hover {
+            color: #101010;
+        }
+
+        .heading {
+            background: #fff;
+            border-bottom: 1px solid #eee;
+            min-height: 60px;
+            line-height: 60px;
+            padding: 0 10px;
+            background-color: #00853e;
+            color: #fff;
+        }
+
+        .listings {
+            height: 100%;
+            overflow: auto;
+            padding-bottom: 60px;
+        }
+
+        .listings .item {
+            display: block;
+            border-bottom: 1px solid #eee;
+            padding: 10px;
+            text-decoration: none;
+        }
+
+        .listings .item:last-child {
+            border-bottom: none;
+        }
+
+        .listings .item .title {
+            display: block;
+            color: #00853e;
+            font-weight: 700;
+        }
+
+        .listings .item .title small {
+            font-weight: 400;
+        }
+
+        .listings .item.active .title,
+        .listings .item .title:hover {
+            color: #8cc63f;
+        }
+
+        .listings .item.active {
+            background-color: #f8f8f8;
+        }
+
+        ::-webkit-scrollbar {
+            width: 3px;
+            height: 3px;
+            border-left: 0;
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        ::-webkit-scrollbar-track {
+            background: none;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #00853e;
+            border-radius: 0;
+        }
+
+        .marker {
+            border: none;
+            cursor: pointer;
+            height: 56px;
+            width: 56px;
+            background-image: url(marker.png);
+            background-color: rgba(0, 0, 0, 0);
+        }
+
+        .clearfix {
+            display: block;
+        }
+
+        .clearfix:after {
+            content: '.';
+            display: block;
+            height: 0;
+            clear: both;
+            visibility: hidden;
+        }
+    </style>
+</head>
+
+<body>
+    <div class='sidebar'>
+        <div class='heading'>
+            <h1>Bay Area Food Banks</h1>
+        </div>
+        <div id='listings' class='listings'></div>
+    </div>
+    <div id='map' class='map'></div>
+
+    <script>
+
+        mapboxgl.accessToken = 'pk.eyJ1IjoidHNlcmluZ2thbGRlbiIsImEiOiJja2NtZHV4ZzAwMGNqMnNsdHhoMjl6bTdhIn0.4F-5TW0aEO3b-iIBGKYMmQ';
+        /**
+         * Add the map to the page
+        */
+        var map = new mapboxgl.Map({
+            container: 'map',
+            style: 'mapbox://styles/mapbox/light-v10',
+            center: [-122.241514, 38.015860],
+            zoom: 9,
+            scrollZoom: false
+        });
+
+
+        var stores = {
+            "type": "FeatureCollection",
+            "features": [
+                {
+                    "type": "Feature",
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [-122.3938076, 37.7545039]
+                    },
+                    "properties": {
+                        "Name": "SF/Marin Food Bank ",
+                        "Address": "900 Pennsylvania Avenue San Francisco, CA 94107",
+                        "Phone": "415-282-1900",
+                        "Donate": "https://donate.sfmfoodbank.org/page/5009/donate/1",
+                        "Volunteer": "https://www.sfmfoodbank.org/volunteer/"
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [-122.4107321, 37.7837642]
+                    },
+                    "properties": {
+                        "Name": "SF City Impact",
+                        "Address": "136 Taylor Street San Francisco, CA 94102",
+                        "Phone": "415-292-1770",
+                        "Donate": "https://secure.qgiv.com/for/sfci/",
+                        "Volunteer": ""
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [-122.413234, 37.7822291]
+                    },
+                    "properties": {
+                        "Name": "St Anthony's",
+                        "Address": "150 Golden Gate Avenue San Francisco, CA 94102",
+                        "Phone": "415-241-2600",
+                        "Donate": "https://www.stanthonysf.org/donate/",
+                        "Volunteer": "https://www.stanthonysf.org/volunteer/"
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [-122.411464, 37.7852299]
+                    },
+                    "properties": {
+                        "Name": "GLIDE Memorial ",
+                        "Address": "330 Ellis Street San Francisco, CA 94102",
+                        "Phone": "415-674-6000",
+                        "Donate": "https://www.glide.org/donate/",
+                        "Volunteer": "http://volunteer.glide.org/"
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [-122.4355953, 37.7913031]
+                    },
+                    "properties": {
+                        "Name": "Food Runners",
+                        "Address": "2579 Washington St, San Francisco, CA 94115",
+                        "Phone": "415-929-1866",
+                        "Donate": "http://www.foodrunners.org/donate-food/",
+                        "Volunteer": "http://www.foodrunners.org/donate-time/"
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [-122.2013871, 37.7415255]
+                    },
+                    "properties": {
+                        "Name": "Alameda County Food Bank",
+                        "Address": "7900 Edgewater Dr, Oakland, CA 94621",
+                        "Phone": "510-635-3663",
+                        "Donate": "https://donate.accfb.org/",
+                        "Volunteer": "https://www.accfb.org/get-involved/volunteer/"
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [-122.0760792, 38.2339597]
+                    },
+                    "properties": {
+                        "Name": "Food Bank of Contra Costa and Solano",
+                        "Address": "2339 Courage Dr, Fairfield, CA 94533",
+                        "Phone": "707-421-9777",
+                        "Donate": "https://www.foodbankccs.org/give-help/donate/donate-food/ccs-food-project/donate-food.html",
+                        "Volunteer": "https://volunteer.foodbankccs.org/"
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [-122.1347298, 38.0167957]
+                    },
+                    "properties": {
+                        "Name": "Loaves and Fishes of Contra Costa County",
+                        "Address": "835 Ferry St, Martinez, CA 94553",
+                        "Phone": "925-293-4792",
+                        "Donate": "https://interland3.donorperfect.net/weblink/WebLink.aspx?name=E345720&id=1",
+                        "Volunteer": "https://www.loavesfishescc.org/vol_landing.html"
+                    }
+                }
+            ]
+        };
+
+        /**
+          * Assign a unique id to each store. You'll use this `id`
+          * later to associate each point on the map with a listing
+          * in the sidebar.
+          */
+        stores.features.forEach(function (store, i) {
+            store.properties.id = i;
+        });
+
+
+    </script>
+</body>
+
+</html>
